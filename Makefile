@@ -1,7 +1,7 @@
-build
+build:
 	@go build -o bin/ecom cmd/main.go
 
-test
+test:
 	@go test -v ./...
 
 run: build

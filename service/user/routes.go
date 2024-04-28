@@ -1,21 +1,23 @@
 package user
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/gorilla/mux"
 
+	"github.com/lipesalin/ecom/service/auth"
 	"github.com/lipesalin/ecom/types"
 	"github.com/lipesalin/ecom/utils"
 
 )
 
 type Handler struct {
-	store *types.UserStore
+	store types.UserStore
 }
 
-func NewHandler() *Handler {
-	return &Handler{}
+func NewHandler(store types.UserStore) *Handler {
+	return &Handler{store: store}
 }
 
 func (h *Handler) RegisterRoutes(router *mux.Router) {
@@ -24,17 +26,44 @@ func (h *Handler) RegisterRoutes(router *mux.Router) {
 }
 
 func (h *Handler) handleLogin(w http.ResponseWriter, r *http.Request) {
-
+	fmt.Println("Teste")
 }
 
 func (h *Handler) handleRegister(w http.ResponseWriter, request *http.Request) {
 	// JSON da request
 	var payloadUser types.RegisterUserPayload
-	err := utils.ParseJSON(request, payloadUser)
+	errParseJSON := utils.ParseJSON(request, payloadUser)
 
-	if err != nil {
-		utils.WriteError(w, http.StatusBadRequest, err)
+	if errParseJSON != nil {
+		utils.WriteError(w, http.StatusBadRequest, errParseJSON)
 	}
+
 	// verifica se o usuário existe
+	_, errFindUser := h.store.GetUserByEmail(payloadUser.Email)
+
+	if errFindUser != nil {
+		utils.WriteError(w, http.StatusBadRequest, errFindUser)
+		return
+	}
+
+	// Passa o hash na senha
+	hashedPassword, errHashPassword := auth.HashPassword(payloadUser.Password)
+
+	if errHashPassword != nil {
+		utils.WriteError(w, http.StatusInternalServerError, errHashPassword)
+	}
+
 	// caso não exista, criar novo usuário
+	errCreateUser := h.store.CreateUser(types.User{
+		Name:     payloadUser.Name,
+		Email:    payloadUser.Email,
+		Password: hashedPassword,
+	})
+
+	if errCreateUser != nil {
+		utils.WriteError(w, http.StatusInternalServerError, errCreateUser)
+		return
+	}
+
+	utils.WriteJSON(w, http.StatusCreated, nil)
 }

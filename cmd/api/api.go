@@ -26,7 +26,8 @@ func (server *APIServer) Run() error {
 	router := mux.NewRouter()
 	subRouter := router.PathPrefix("/api/v1").Subrouter()
 
-	useHandler := user.NewHandler()
+	userStore := user.NewStore(server.db)
+	useHandler := user.NewHandler(userStore)
 	useHandler.RegisterRoutes(subRouter)
 
 	log.Println("Servidor online", server.address)
