@@ -5,10 +5,21 @@ import (
 	"fmt"
 
 	"github.com/lipesalin/ecom/types"
+
 )
 
 type Store struct {
 	db *sql.DB
+}
+
+// CreateUser implements types.UserStore.
+func (s *Store) CreateUser(types.User) error {
+	panic("unimplemented")
+}
+
+// GetUserByID implements types.UserStore.
+func (s *Store) GetUserByID(id int) (*types.User, error) {
+	panic("unimplemented")
 }
 
 func NewStore(db *sql.DB) *Store {

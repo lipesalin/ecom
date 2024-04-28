@@ -4,12 +4,12 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/go-playground/validator/v10"
 	"github.com/gorilla/mux"
 
 	"github.com/lipesalin/ecom/service/auth"
 	"github.com/lipesalin/ecom/types"
 	"github.com/lipesalin/ecom/utils"
-
 )
 
 type Handler struct {
@@ -32,10 +32,18 @@ func (h *Handler) handleLogin(w http.ResponseWriter, r *http.Request) {
 func (h *Handler) handleRegister(w http.ResponseWriter, request *http.Request) {
 	// JSON da request
 	var payloadUser types.RegisterUserPayload
-	errParseJSON := utils.ParseJSON(request, payloadUser)
+	errParseJSON := utils.ParseJSON(request, &payloadUser)
 
 	if errParseJSON != nil {
 		utils.WriteError(w, http.StatusBadRequest, errParseJSON)
+	}
+
+	// validar request
+	errValidator := utils.Validate.Struct(payloadUser)
+	if errValidator != nil {
+		errorsValidation := errValidator.(validator.ValidationErrors)
+		utils.WriteError(w, http.StatusBadRequest, fmt.Errorf("Request inválida %v", errorsValidation))
+		return
 	}
 
 	// verifica se o usuário existe

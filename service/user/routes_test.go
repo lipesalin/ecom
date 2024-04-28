@@ -11,7 +11,6 @@ import (
 	"github.com/gorilla/mux"
 
 	"github.com/lipesalin/ecom/types"
-
 )
 
 func TestUserServiceHandlers(t *testing.T) {
@@ -22,7 +21,7 @@ func TestUserServiceHandlers(t *testing.T) {
 		payloadUser := types.RegisterUserPayload{
 			Name:     "felipe",
 			Email:    "",
-			Password: "123",
+			Password: "12",
 		}
 
 		// parse JSON
@@ -46,7 +45,7 @@ func TestUserServiceHandlers(t *testing.T) {
 		router.ServeHTTP(recorder, request)
 
 		if recorder.Code != http.StatusBadRequest {
-			t.Errorf("expected status code %d", http.StatusBadRequest, recorder.Code)
+			t.Errorf("expected status code %d, got %d", http.StatusBadRequest, recorder.Code)
 		}
 	})
 }
