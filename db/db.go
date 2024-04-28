@@ -5,6 +5,7 @@ import (
 	"log"
 
 	_ "github.com/lib/pq"
+
 )
 
 func NewDBConnection(connection string) (*sql.DB, error) {

@@ -42,7 +42,7 @@ func (h *Handler) handleRegister(w http.ResponseWriter, request *http.Request) {
 	errValidator := utils.Validate.Struct(payloadUser)
 	if errValidator != nil {
 		errorsValidation := errValidator.(validator.ValidationErrors)
-		utils.WriteError(w, http.StatusBadRequest, fmt.Errorf("Request inválida %v", errorsValidation))
+		utils.WriteError(w, http.StatusBadRequest, errorsValidation)
 		return
 	}
 

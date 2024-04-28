@@ -11,6 +11,7 @@ import (
 	"github.com/gorilla/mux"
 
 	"github.com/lipesalin/ecom/types"
+
 )
 
 func TestUserServiceHandlers(t *testing.T) {
@@ -20,8 +21,8 @@ func TestUserServiceHandlers(t *testing.T) {
 	t.Run("Deve falhar caso os dados da request sejam inválidos", func(t *testing.T) {
 		payloadUser := types.RegisterUserPayload{
 			Name:     "felipe",
-			Email:    "",
-			Password: "12",
+			Email:    "invalido",
+			Password: "123",
 		}
 
 		// parse JSON
@@ -46,6 +47,38 @@ func TestUserServiceHandlers(t *testing.T) {
 
 		if recorder.Code != http.StatusBadRequest {
 			t.Errorf("expected status code %d, got %d", http.StatusBadRequest, recorder.Code)
+		}
+	})
+
+	t.Run("registrar o usuário corretamente", func(t *testing.T) {
+		payloadUser := types.RegisterUserPayload{
+			Name:     "felipe",
+			Email:    "email@valido.com",
+			Password: "123",
+		}
+
+		// parse JSON
+		userJSON, errParseJSON := json.Marshal(payloadUser)
+
+		if errParseJSON != nil {
+			log.Fatal(errParseJSON)
+		}
+
+		// [Request]
+		request, errRequest := http.NewRequest(http.MethodPost, "/register", bytes.NewBuffer(userJSON))
+
+		if errRequest != nil {
+			t.Fatal(errRequest)
+		}
+
+		recorder := httptest.NewRecorder()
+		router := mux.NewRouter()
+
+		router.HandleFunc("/register", handler.handleRegister)
+		router.ServeHTTP(recorder, request)
+
+		if recorder.Code != http.StatusCreated {
+			t.Errorf("expected status code %d, got %d", http.StatusCreated, recorder.Code)
 		}
 	})
 }
