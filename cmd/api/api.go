@@ -6,7 +6,8 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
-	"github.com/lipesalin/service/user"
+
+	"github.com/lipesalin/ecom/service/user"
 )
 
 type APIServer struct {
@@ -14,7 +15,7 @@ type APIServer struct {
 	db      *sql.DB
 }
 
-func newAPIServer(address string, db *sql.DB) *APIServer {
+func NewAPIServer(address string, db *sql.DB) *APIServer {
 	return &APIServer{
 		address: address,
 		db:      db,
@@ -26,7 +27,7 @@ func (server *APIServer) Run() error {
 	subRouter := router.PathPrefix("/api/v1").Subrouter()
 
 	useHandler := user.NewHandler()
-	useHandler.RegisterRoutes()
+	useHandler.RegisterRoutes(subRouter)
 
 	log.Println("Servidor online", server.address)
 
